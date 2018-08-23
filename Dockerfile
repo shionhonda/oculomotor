@@ -19,8 +19,7 @@ RUN pip install --upgrade pip setuptools && \
     pip --no-cache-dir install \
     numpy==1.14.5 flask \
     pygame pyglet opencv-python opencv-contrib-python \
-    BriCA2 oculoenv 
-    #chainer torch torchvision tensorflow 
+    BriCA2 oculoenv chainer chainerrl
 
 ENV CONTAINER_APP /opt/oculomotor
 

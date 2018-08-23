@@ -30,13 +30,13 @@ class SC(object):
         decided_ey = 0.0
         
         # TODO: デバッグで現在最大のlikelihoodを持つactionを反映している
-        for data in fef_data:
+        for i,data in enumerate(fef_data):
             likelihood = data[0]
             ex = data[1]
             ey = data[2]
-            if likelihood > 0.1 and likelihood > max_likelihoood:
-                decided_ex = ex
-                decided_ey = ey
+            if likelihood > bg_data[i]:
+                decided_ex += ex
+                decided_ey += ey
                 max_likelihoood = likelihood
                 
         action = [decided_ex * 0.01, decided_ey * 0.01]

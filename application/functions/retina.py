@@ -81,11 +81,9 @@ class Retina(object):
 
         # Conver to Grayscale
         gray_blur_image = cv2.cvtColor(blur_image, cv2.COLOR_BGR2GRAY)
-        gray_blur_image = np.reshape(gray_blur_image,
-                                     [gray_blur_image.shape[0],
-                                      gray_blur_image.shape[0], 1])
-        gray_blur_image = np.tile(gray_blur_image, 3)
+        gray_blur_image = np.tile(gray_blur_image, [3,1,1]).transpose(1,2,0)
         return gray_blur_image
+
 
     def _create_retina_image(self, image):
         blur_image = self._create_blur_image(image)
