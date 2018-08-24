@@ -1,31 +1,50 @@
 # oculomotor
 WBAI 2018 Hackathon Oculomotor Project Repository.
 
+[![preview](./doc/images/preview0.png)](https://youtu.be/WH7AUJzk70o)
+
+## Requirements
+### Docker
+[How to install](https://docs.docker.com/install/)
+
+After successfull install, you should be able to run `docker ps` and get something like this:
+
+```
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
+
 ## Usage
-### 1. Clone this repository.
+The code can be executed in two modes: the interactive mode and batch mode.
+
+### Common Instructions
+#### Clone this repository
 ```
 $ git clone --recursive https://github.com/wbap/oculomotor
 ```
 
-### 2. Build the base docker image.
+#### Build the docker containers
 ```
-# 2. Build the base docker image.
-$ docker build -t wbap/oculomotor-base ./base
-```
-
-### 3. Edit the files under `appliation/functions`.
-
-### 4. Build the server docker image.
-```
-$ docker build -t wbap/oculomotor-server .
+$ cd oculomotor
+$ docker build -t wbap/oculomotor .
 ```
 
-### 5. Run the server docker image.
+#### Edit the files under `application/functions` as you like
+
+### Running in Interactive Mode
+#### Run the container using the helper script
 ```
-$ docker run -it -p 8080:80 wbap/oculomotor-server
+$ ./helpers/run_interactive.sh
 ```
 
-### 6. Run the client script.
+#### Open the monitor interface in the browser
+Access the monitor [link](http://0.0.0.0:5000/monitor/index.html).
+
+![screenshot](./doc/images/screenshot0.png)
+
+
+### Running in Batch Mode
+#### Run the container using the helper script
 ```
-$ python client.py
-```
+ $ ./helpers/train.sh --content=1 --step_size=100000
+``` 
