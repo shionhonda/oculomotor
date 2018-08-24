@@ -14,8 +14,8 @@ class SC(object):
         if 'from_bg' not in inputs:
             raise Exception('SC did not recieve from BG')
         
-        fef_data = inputs['from_fef']
-        bg_data = inputs['from_bg']
+        fef_data = np.array(inputs['from_fef'])
+        bg_data =inputs['from_bg']
 
         action = self._decide_action(fef_data, bg_data)
         
@@ -25,19 +25,14 @@ class SC(object):
         return dict(to_environment=action)
 
     def _decide_action(self, fef_data, bg_data):
-        max_likelihoood = -1.0
-        decided_ex = 0.0
-        decided_ey = 0.0
-        
-        # TODO: デバッグで現在最大のlikelihoodを持つactionを反映している
-        for i,data in enumerate(fef_data):
-            likelihood = data[0]
-            ex = data[1]
-            ey = data[2]
-            if likelihood > bg_data[i]:
-                decided_ex += ex
-                decided_ey += ey
-                max_likelihoood = likelihood
-                
-        action = [decided_ex * 0.01, decided_ey * 0.01]
-        return np.array(action, dtype=np.float32)
+        '''
+          Function: Choose the direction with maximum likelihood subtracted by threshold
+          Inputs: 
+            bg_data: 0-63 are saliency thresholds; 64-127 are cursor thresholds; 128 is lambda
+        '''
+
+        diff = fef_data[:,0]-bg_data[:-1]
+        lamda = bg_data[-1]
+        max_idx = np.argmax(lamda*diff[:64] + (1-lamda)*diff[64:])
+        action = 0.01 * fef_data[max_idx, 1:]
+        return action

@@ -37,13 +37,14 @@ def get_content(content_type):
 
 
 def train(content, step_size):
+    bg = BG()
     agent = Agent(
         retina=Retina(),
         lip=LIP(),
         vc=VC(),
         pfc=PFC(),
         fef=FEF(),
-        bg=BG(),
+        bg=bg,
         sc=SC(),
     )
     
@@ -55,7 +56,7 @@ def train(content, step_size):
     done = False
     
     episode_reward = 0
-
+    n_episode = 0
     step = 0
     
     for i in range(step_size):
@@ -71,6 +72,9 @@ def train(content, step_size):
             obs = env.reset()
             print("episode reward={}".format(episode_reward))
             episode_reward = 0
+            bg.agent.save("./results/"+str(n_episode))
+            n_episode += 1
+
             
             
 def main():
