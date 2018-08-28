@@ -7,6 +7,7 @@ class SC(object):
         self.timing = brica.Timing(6, 1, 0)
 
         self.last_fef_data = None
+        self.last_sc_data = None
 
     def __call__(self, inputs):
         if 'from_fef' not in inputs:
@@ -33,6 +34,7 @@ class SC(object):
 
         diff = fef_data[:,0]-bg_data[:-1]
         lamda = bg_data[-1]
-        max_idx = np.argmax(lamda*diff[:64] + (1-lamda)*diff[64:])
+        self.last_sc_data = lamda*diff[:64] + (1-lamda)*diff[64:]
+        max_idx = np.argmax(self.last_sc_data)
         action = 0.01 * fef_data[max_idx, 1:]
         return action
