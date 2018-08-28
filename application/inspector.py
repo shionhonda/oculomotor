@@ -32,7 +32,9 @@ class Inspector(object):
         self.vc = VC()
         self.pfc = PFC()
         self.fef = FEF()
-        self.bg = BG()
+        #self.bg = BG() # Train mode
+        self.bg = BG(train=False, backprop=False) # Test mode
+        self.bg.agent.load("./results/"+str(43)) # Test mode
         self.sc = SC()
 
         self.agent = Agent(
@@ -133,8 +135,9 @@ class Inspector(object):
         pygame.draw.rect(self.surface, DARK_GRAY, Rect(left, top, 128, 128), 1)
 
     def show_reward(self):
-        self.draw_text("REWARD: {}".format(int(self.episode_reward)),
-                       128 * 3 + 24, 128 + 48)
+        #self.draw_text("REWARD: {}".format(int(self.episode_reward)),
+        self.draw_text("PHASE: {}".format(int(self.pfc.phase)),
+                             128 * 3 + 24, 128 + 48)
 
     def show_fef_data_bars(self, fef_data):
         fef_data_len = len(fef_data)

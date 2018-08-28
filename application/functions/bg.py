@@ -5,12 +5,12 @@ from chainer import optimizers
 import chainerrl
 
 class BG(object):
-    def __init__(self, alpha=0.5, gamma=0.95):
+    def __init__(self, alpha=0.5, gamma=0.95, train=True, backprop=True):
         self.timing = brica.Timing(5, 1, 0)
         self.agent = _set_agent()
         self.reward = 0
-        chainer.config.train = False
-        chainer.config.enable_backprop = False
+        chainer.config.train = train
+        chainer.config.enable_backprop = backprop
         
 
     def __call__(self, inputs):
@@ -22,7 +22,7 @@ class BG(object):
           inputs['from_fef']: list size of 128*3, that is, 8*8*2*[likelihood, ex, ey].
           saliency accumulation, cursor accumulation in order.
         Outputs:
-          likelihood_thresholds: numpy array size of 64
+          likelihood_thresholds: numpy array size of 128+1
         """
         # from_envがない
 
@@ -34,23 +34,24 @@ class BG(object):
             raise Exception('BG did not recieve from FEF')
 
         fef_data = np.array(inputs['from_fef'])
+        pfc_data = inputs['from_pfc']
         state = fef_data[:, 0]
         action = self.agent.act_and_train(state, self.reward)
         reward, done = inputs['from_environment']
 
-        return dict(to_pfc=None, to_fef=None, to_sc=action)
+        return dict(to_pfc=None, to_fef=None, to_sc=np.hstack((action, pfc_data)))
 
 def _phi(obs):
     return obs.astype(np.float32)
 
 def _set_agent(actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
     q_func = chainerrl.q_functions.FCSAQFunction(
-        128, 129,
-        n_hidden_channels=256,
+        128, 128,
+        n_hidden_channels=64,
         n_hidden_layers=3)
     pi = chainerrl.policy.FCDeterministicPolicy(
-        128, action_size=129,
-        n_hidden_channels=256,
+        128, action_size=128,
+        n_hidden_channels=64,
         n_hidden_layers=3,
         min_action=0, max_action=1,
         bound_action=True)

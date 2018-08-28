@@ -10,7 +10,7 @@ from .utils import load_image
 GRID_DIVISION = 8
 GRID_WIDTH = 128 // GRID_DIVISION
 
-CURSOR_MATCH_COEFF = 0.1
+CURSOR_MATCH_COEFF = 0.3
 SALIENCY_COEFF = 0.3
 
 
@@ -45,7 +45,7 @@ class ActionAccumulator(object):
 
 class SaliencyAccumulator(ActionAccumulator):
     def __init__(self, pixel_x, pixel_y, ex, ey):
-        super(SaliencyAccumulator, self).__init__(ex, ey, decay_rate=0.85)
+        super(SaliencyAccumulator, self).__init__(ex, ey, decay_rate=0.95)
         # Pixel x,y pos at left top corner of the region.
         self.pixel_x = pixel_x
         self.pixel_y = pixel_y

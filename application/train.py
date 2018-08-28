@@ -67,6 +67,8 @@ def train(content, step_size):
 
         episode_reward += reward
         step += 1
+        #if i%1080==0:
+            #print(int(i/1080))
 
         if done:
             obs = env.reset()

@@ -19,6 +19,9 @@ parts/
 sdist/
 var/
 wheels/
+results/
+./results/
+*ipynb
 *.egg-info/
 .installed.cfg
 *.egg
