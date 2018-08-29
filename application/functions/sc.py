@@ -8,6 +8,7 @@ class SC(object):
 
         self.last_fef_data = None
         self.last_sc_data = None
+        self.thresholds = None
 
     def __call__(self, inputs):
         if 'from_fef' not in inputs:
@@ -18,7 +19,7 @@ class SC(object):
         fef_data = np.array(inputs['from_fef'])
         bg_data =inputs['from_bg']
 
-        action, self.last_sc_data = self._decide_action(fef_data, bg_data)
+        action = self._decide_action(fef_data, bg_data)
         
         # Store FEF data for debug visualizer
         self.last_fef_data = fef_data
@@ -31,11 +32,10 @@ class SC(object):
           Inputs: 
             bg_data: 0-63 are saliency thresholds; 64-127 are cursor thresholds; 128 is lambda
         '''
-
+        self.thresholds = bg_data[:-1]
         diff = fef_data[:,0]-bg_data[:-1]
         lamda = bg_data[-1]
-        print("IIIIIII")
-        last_sc_data = lamda*diff[:64] + (1-lamda)*diff[64:]
-        max_idx = np.argmax(last_sc_data)
+        self.last_sc_data = lamda*diff[:64] + (1-lamda)*diff[64:]
+        max_idx = np.argmax(self.last_sc_data)
         action = 0.01 * fef_data[max_idx, 1:]
-        return action, last_sc_data
+        return action

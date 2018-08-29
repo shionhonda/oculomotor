@@ -98,11 +98,15 @@ class Inspector(object):
         self.show_image(data, 128 * 2 + 8, 8, "saliency")
 
     def show_action_map(self, action_map):
-        action_map_ = np.clip(action_map, 0.0, 1.0)
-        data = action_map_.astype(np.uint8)
-        #data = data.reshape(8,8)
-        #data = np.stack([data for _ in range(3)], axis=2)
-        self.show_grid(data,0, 8,8, 128 * 3 + 8, 8, "action")
+        action_map_std = (action_map-np.min(action_map))/(np.max(action_map)-np.min(action_map))
+        data = action_map_std.astype(np.uint8)
+        self.show_grid(data,0, 8, 16, 8, 380, "action")
+
+    def show_thres_map(self, thresholds):
+        sal_std = (thresholds[:64]-np.min(thresholds[:64]))/(np.max(thresholds[:64])-np.min(thresholds[:64]))
+        cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
+        self.show_grid(sal_std.astype(np.uint8),0, 8, 16, 128 + 8, 200, "saliency thres")
+        self.show_grid(cur_std.astype(np.uint8),0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
 
     def show_optical_flow(self, optical_flow):
         # Show optical flow with HSV color image
@@ -142,9 +146,10 @@ class Inspector(object):
         pygame.draw.rect(self.surface, DARK_GRAY, Rect(left, top, 128, 128), 1)
 
     def show_reward(self):
-        #self.draw_text("REWARD: {}".format(int(self.episode_reward)),
+        self.draw_text("REWARD: {}".format(int(self.episode_reward)),
+                        128 * 3 + 24, 380)
         self.draw_text("PHASE: {}".format(int(self.pfc.phase)),
-                             128 * 3 + 24, 128 + 48)
+                            128 * 3 + 24, 400)
 
     def show_fef_data_bars(self, fef_data):
         fef_data_len = len(fef_data)
@@ -176,10 +181,10 @@ class Inspector(object):
             likelihoods0.append(fef_data[i][0])
             likelihoods1.append(fef_data[i + data_len][0])
 
-        self.show_grid(likelihoods0, 0, grid_division, grid_width, 8, 300,
+        self.show_grid(likelihoods0, 0, grid_division, grid_width, 8, 200,
                        "saliency acc")
-        self.show_grid(likelihoods1, 0, grid_division, grid_width, 8 + 128,
-                       300, "cursor acc")
+        self.show_grid(likelihoods1, 0, grid_division, grid_width, 8 + 128*2,
+                       200, "cursor acc")
 
     def show_grid(self, data, offset, grid_division, grid_width, left, top,
                   label):
@@ -224,15 +229,19 @@ class Inspector(object):
 
         if self.sc.last_sc_data is not None:
             self.show_action_map(self.sc.last_sc_data)
-        else:
-            print("None")
 
         if self.lip.last_optical_flow is not None:
             self.show_optical_flow(self.lip.last_optical_flow)
 
         if self.sc.last_fef_data is not None:
-            self.show_fef_data_bars(self.sc.last_fef_data)
+            #self.show_fef_data_bars(self.sc.last_fef_data)
             self.show_fef_data_grid(self.sc.last_fef_data)
+
+        if self.sc.thresholds is not None:
+            #self.show_fef_data_bars(self.sc.last_fef_data)
+            self.show_thres_map(self.sc.thresholds)
+            print('max', np.max(self.sc.thresholds))
+            print('min', np.min(self.sc.thresholds))
 
         self.last_image = image
         self.last_angle = angle
