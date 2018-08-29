@@ -98,12 +98,11 @@ class Inspector(object):
         self.show_image(data, 128 * 2 + 8, 8, "saliency")
 
     def show_action_map(self, action_map):
-        action_map_ = np.clip(action_map * 255.0, 0.0, 255.0)
+        action_map_ = np.clip(action_map, 0.0, 1.0)
         data = action_map_.astype(np.uint8)
-        print(data.shape)
-        data = data.reshape(8,8)
-        data = np.stack([data for _ in range(3)], axis=2)
-        self.show_image(data, 128 * 3 + 8, 8, "action")
+        #data = data.reshape(8,8)
+        #data = np.stack([data for _ in range(3)], axis=2)
+        self.show_grid(data,0, 8,8, 128 * 3 + 8, 8, "action")
 
     def show_optical_flow(self, optical_flow):
         # Show optical flow with HSV color image
@@ -137,7 +136,7 @@ class Inspector(object):
         return image
 
     def show_image(self, data, left, top, label):
-        image = pygame.image.frombuffer(data, (256, 256), 'RGB')
+        image = pygame.image.frombuffer(data, (128, 128), 'RGB')
         self.surface.blit(image, (left, top))
         self.draw_center_text(label, 128 / 2 + left, top + 128 + 8)
         pygame.draw.rect(self.surface, DARK_GRAY, Rect(left, top, 128, 128), 1)
@@ -225,6 +224,8 @@ class Inspector(object):
 
         if self.sc.last_sc_data is not None:
             self.show_action_map(self.sc.last_sc_data)
+        else:
+            print("None")
 
         if self.lip.last_optical_flow is not None:
             self.show_optical_flow(self.lip.last_optical_flow)

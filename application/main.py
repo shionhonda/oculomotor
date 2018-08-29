@@ -35,7 +35,7 @@ contents = [
     RandomDotMotionDiscriminationContent(),
 ]
 
-display_size = (128 * 4 + 16, 500)
+display_size = (128 * 4 + 16, 800)
 
 
 class Runner(object):

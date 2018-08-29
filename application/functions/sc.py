@@ -18,7 +18,7 @@ class SC(object):
         fef_data = np.array(inputs['from_fef'])
         bg_data =inputs['from_bg']
 
-        action = self._decide_action(fef_data, bg_data)
+        action, self.last_sc_data = self._decide_action(fef_data, bg_data)
         
         # Store FEF data for debug visualizer
         self.last_fef_data = fef_data
@@ -34,7 +34,8 @@ class SC(object):
 
         diff = fef_data[:,0]-bg_data[:-1]
         lamda = bg_data[-1]
-        self.last_sc_data = lamda*diff[:64] + (1-lamda)*diff[64:]
-        max_idx = np.argmax(self.last_sc_data)
+        print("IIIIIII")
+        last_sc_data = lamda*diff[:64] + (1-lamda)*diff[64:]
+        max_idx = np.argmax(last_sc_data)
         action = 0.01 * fef_data[max_idx, 1:]
-        return action
+        return action, last_sc_data
