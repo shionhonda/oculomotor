@@ -47,11 +47,11 @@ def _phi(obs):
 def _set_agent(actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
     q_func = chainerrl.q_functions.FCSAQFunction(
         128, 128,
-        n_hidden_channels=64,
+        n_hidden_channels=32,
         n_hidden_layers=3)
     pi = chainerrl.policy.FCDeterministicPolicy(
         128, action_size=128,
-        n_hidden_channels=64,
+        n_hidden_channels=32,
         n_hidden_layers=3,
         min_action=0, max_action=1,
         bound_action=True)
