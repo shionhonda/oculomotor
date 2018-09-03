@@ -1,8 +1,15 @@
+import numpy as np
 import brica
 import numpy as np
 import chainer
 from chainer import optimizers
 import chainerrl
+
+
+"""
+This is an example implemention of BG (Basal ganglia) module.
+You can change this as you like.
+"""
 
 class BG(object):
     def __init__(self, alpha=0.5, gamma=0.95, train=True, backprop=True):
@@ -33,7 +40,7 @@ class BG(object):
         if 'from_fef' not in inputs:
             raise Exception('BG did not recieve from FEF')
 
-        fef_data = np.array(inputs['from_fef'])
+        fef_data = np.array(inputs['from_fef'][:64])
         pfc_data = inputs['from_pfc']
         state = fef_data[:, 0]
         action = self.agent.act_and_train(state, self.reward)
@@ -46,12 +53,12 @@ def _phi(obs):
 
 def _set_agent(actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
     q_func = chainerrl.q_functions.FCSAQFunction(
-        128, 128,
-        n_hidden_channels=32,
+        64, 64,
+        n_hidden_channels=16,
         n_hidden_layers=3)
     pi = chainerrl.policy.FCDeterministicPolicy(
-        128, action_size=128,
-        n_hidden_channels=32,
+        64, action_size=64,
+        n_hidden_channels=16,
         n_hidden_layers=3,
         min_action=0, max_action=1,
         bound_action=True)

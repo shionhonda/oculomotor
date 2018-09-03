@@ -19,9 +19,12 @@ RUN pip install --upgrade pip setuptools && \
     pip --no-cache-dir install \
     numpy==1.14.5 flask \
     pygame pyglet opencv-python opencv-contrib-python \
-    BriCA2 chainer chainerrl
+    BriCA2 tensorflow chainer chainerrl
     # oculoenv
-RUN pip install git+https://
+
+RUN apt-get update && apt-get -y install git
+
+RUN pip install git+https://github.com/shionhonda/oculoenv
 
 ENV CONTAINER_APP /opt/oculomotor
 
@@ -31,7 +34,7 @@ ENV PYTHONPATH ${CONTAINER_APP}/application:${CONTAINER_APP}/test
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-EXPOSE 5000
+EXPOSE 5000 6006
 
 ENV FLASK_APP ${CONTAINER_APP}/application/main.py
 ENV FLASK_ENV development

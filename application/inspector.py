@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Visualize processed processed image, state, etc in each function component of the Agent.
+This inspector renders these information into an image, and it can be retrieved by get_frame().
+"""
+
 import math
 import time
 
@@ -7,7 +13,7 @@ import pygame, sys
 from pygame.locals import *
 
 from agent import Agent
-from functions import BG, FEF, LIP, PFC, Retina, SC, VC
+from functions import BG, FEF, LIP, PFC, Retina, SC, VC, HP, CB
 from oculoenv import Environment
 
 from oculoenv import PointToTargetContent, ChangeDetectionContent, OddOneOutContent, VisualSearchContent, MultipleObjectTrackingContent, RandomDotMotionDiscriminationContent
@@ -34,8 +40,10 @@ class Inspector(object):
         self.fef = FEF()
         #self.bg = BG() # Train mode
         self.bg = BG(train=False, backprop=False) # Test mode
-        self.bg.agent.load("./results/"+str(43)) # Test mode
+        self.bg.agent.load("./results/"+str(64)) # Test mode
         self.sc = SC()
+        self.hp = HP()
+        self.cb = CB()
 
         self.agent = Agent(
             retina=self.retina,
@@ -45,6 +53,8 @@ class Inspector(object):
             fef=self.fef,
             bg=self.bg,
             sc=self.sc,
+            hp=self.hp,
+            cb=self.cb
         )
 
         self.env = Environment(content)
@@ -104,9 +114,9 @@ class Inspector(object):
 
     def show_thres_map(self, thresholds):
         sal_std = (thresholds[:64]-np.min(thresholds[:64]))/(np.max(thresholds[:64])-np.min(thresholds[:64]))
-        cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
+        #cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
         self.show_grid(sal_std.astype(np.uint8),0, 8, 16, 128 + 8, 200, "saliency thres")
-        self.show_grid(cur_std.astype(np.uint8),0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
+        #self.show_grid(cur_std.astype(np.uint8),0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
 
     def show_optical_flow(self, optical_flow):
         # Show optical flow with HSV color image
@@ -126,6 +136,10 @@ class Inspector(object):
         for (x1, y1), (x2, y2) in lines:
             cv2.circle(image, (x1, y1), 1, (0, 255, 0), -1)
         self.show_image(image, 128 * 3 + 8, 8, "opt_flow")
+
+    def show_map_image(self, map_image):
+        # Show allocentric map image in the Hippocampal formation.
+        self.show_image(map_image, 128 * 3 + 8, 300, "allocentric map")
 
     def get_optical_flow_hsv(self, optical_flow):
         h, w = optical_flow.shape[:2]
@@ -242,6 +256,8 @@ class Inspector(object):
             self.show_thres_map(self.sc.thresholds)
             print('max', np.max(self.sc.thresholds))
             print('min', np.min(self.sc.thresholds))
+        # if self.hp.map_image is not None:
+        #     self.show_map_image(self.hp.map_image)
 
         self.last_image = image
         self.last_angle = angle
