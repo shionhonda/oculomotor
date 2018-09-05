@@ -44,7 +44,7 @@ class BG(object):
         pfc_data = inputs['from_pfc']
         state = fef_data[:, 0]
         action = self.agent.act_and_train(state, self.reward)
-        reward, done = inputs['from_environment']
+        self.reward, done = inputs['from_environment']
 
         return dict(to_pfc=None, to_fef=None, to_sc=np.hstack((action, pfc_data)))
 
