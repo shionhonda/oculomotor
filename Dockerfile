@@ -18,19 +18,7 @@ RUN if [ ! -e /usr/bin/python ]; then ln -sf /usr/bin/python3 /usr/bin/python; f
 COPY requirements.txt /tmp
 
 RUN pip install --upgrade pip setuptools && \
-<<<<<<< HEAD
-    pip --no-cache-dir install \
-    numpy==1.14.5 flask \
-    pygame pyglet opencv-python opencv-contrib-python \
-    BriCA2 tensorflow chainer chainerrl
-    # oculoenv
-
-RUN apt-get update && apt-get -y install git
-
-RUN pip install git+https://github.com/shionhonda/oculoenv
-=======
     pip --no-cache-dir install -r /tmp/requirements.txt
->>>>>>> upstream/master
 
 ENV CONTAINER_APP /opt/oculomotor
 WORKDIR ${CONTAINER_APP}

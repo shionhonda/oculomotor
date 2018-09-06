@@ -113,9 +113,7 @@ class Inspector(object):
         self.show_grid(data,0, 8, 16, 8, 380, "action")
 
     def show_thres_map(self, thresholds):
-        print('Thr',thresholds[:64])
         sal_std = (thresholds[:64]-np.min(thresholds[:64]))/(np.max(thresholds[:64])-np.min(thresholds[:64]))
-        print('std', sal_std)
         #cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
         self.show_grid(sal_std,0, 8, 16, 128 + 8, 200, "saliency thres")
         #self.show_grid(cur_std,0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
@@ -256,8 +254,6 @@ class Inspector(object):
         if self.sc.thresholds is not None:
             #self.show_fef_data_bars(self.sc.last_fef_data)
             self.show_thres_map(self.sc.thresholds)
-            print('max', np.max(self.sc.thresholds))
-            print('min', np.min(self.sc.thresholds))
         # if self.hp.map_image is not None:
         #     self.show_map_image(self.hp.map_image)
 
