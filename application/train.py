@@ -39,7 +39,7 @@ def get_content(content_type):
     return content
 
 
-def train(content, step_size, logger):
+def train(content, step_size, logger, gpuid):
     retina = Retina()
     lip = LIP()
     vc = VC()
