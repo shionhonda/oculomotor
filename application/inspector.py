@@ -109,14 +109,16 @@ class Inspector(object):
 
     def show_action_map(self, action_map):
         action_map_std = (action_map-np.min(action_map))/(np.max(action_map)-np.min(action_map))
-        data = action_map_std.astype(np.uint8)
+        data = action_map_std
         self.show_grid(data,0, 8, 16, 8, 380, "action")
 
     def show_thres_map(self, thresholds):
+        print('Thr',thresholds[:64])
         sal_std = (thresholds[:64]-np.min(thresholds[:64]))/(np.max(thresholds[:64])-np.min(thresholds[:64]))
+        print('std', sal_std)
         #cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
-        self.show_grid(sal_std.astype(np.uint8),0, 8, 16, 128 + 8, 200, "saliency thres")
-        #self.show_grid(cur_std.astype(np.uint8),0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
+        self.show_grid(sal_std,0, 8, 16, 128 + 8, 200, "saliency thres")
+        #self.show_grid(cur_std,0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
 
     def show_optical_flow(self, optical_flow):
         # Show optical flow with HSV color image
