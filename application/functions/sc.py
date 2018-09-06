@@ -44,3 +44,7 @@ class SC(object):
         max_idx = np.argmax(self.last_sc_data)
         action = fef_data[max_idx, 1:]
         return action
+
+def softmax(x):
+    ex = np.exp(x)
+    return ex/np.sum(ex)
