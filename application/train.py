@@ -45,7 +45,7 @@ def train(content, step_size, logger):
     vc = VC()
     pfc = PFC()
     fef = FEF()
-    bg = BG()
+    bg = BG(gpuid=gpuid)
     sc = SC()
     hp = HP()
     cb = CB()
@@ -128,12 +128,14 @@ def main():
                         default=1)
     parser.add_argument("--step_size", help="Training step size", type=int, default=1000000)
     parser.add_argument("--log_file", help="Log file name", type=str, default="experiment0")
+    parser.add_argument('--gpuid', type=int, default=-1, help='GPU ID to use. Set -1 for CPU.')
     
     args = parser.parse_args()
     
     content_type = args.content
     step_size = args.step_size
     log_file = args.log_file
+    gpuid = args.gpuid
 
     # Create task content
     content = get_content(content_type)
@@ -145,7 +147,7 @@ def main():
     logger = Logger(log_path)
 
     # Start training
-    train(content, step_size, logger)
+    train(content, step_size, logger, gpuid)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
-import numpy as np
+import argparse
+import numpy
 import brica
-import numpy as np
 import chainer
-from chainer import optimizers
+from chainer import cuda, optimizers
 import chainerrl
 
 
@@ -12,10 +12,17 @@ You can change this as you like.
 """
 
 class BG(object):
-    def __init__(self, alpha=0.5, gamma=0.95, train=True, backprop=True):
+    def __init__(self, gpuid=-1, alpha=0.5, gamma=0.95, train=True, backprop=True):
         self.timing = brica.Timing(5, 1, 0)
-        self.agent = _set_agent()
+        self.agent = _set_agent(gpuid=gpuid)
         self.reward = 0
+        if gpuid<0:
+            self.xp = numpy
+        else:
+            cuda.get_device(gpuid).use()
+
+            self.xp = cuda.cupy
+
         chainer.config.train = train
         chainer.config.enable_backprop = backprop
         
@@ -40,18 +47,18 @@ class BG(object):
         if 'from_fef' not in inputs:
             raise Exception('BG did not recieve from FEF')
 
-        fef_data = np.array(inputs['from_fef'][:64])
+        fef_data = self.xp.array(inputs['from_fef'][:64])
         pfc_data = inputs['from_pfc']
         state = fef_data[:, 0]
         action = self.agent.act_and_train(state, self.reward)
         self.reward, done = inputs['from_environment']
 
-        return dict(to_pfc=None, to_fef=None, to_sc=np.hstack((action, pfc_data)))
+        return dict(to_pfc=None, to_fef=None, to_sc=self.xp.hstack((action, pfc_data)))
 
 def _phi(obs):
-    return obs.astype(np.float32)
+    return obs.astype(self.xp.float32)
 
-def _set_agent(actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
+def _set_agent(gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
     q_func = chainerrl.q_functions.FCSAQFunction(
         64, 64,
         n_hidden_channels=16,
@@ -62,6 +69,9 @@ def _set_agent(actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
         n_hidden_layers=3,
         min_action=0, max_action=1,
         bound_action=True)
+    if gpuid>=0:
+        q_func.to_gpu(gpuid)
+        pi.to_gpu(gpuid)
     model = chainerrl.agents.ddpg.DDPGModel(q_func=q_func, policy=pi)
     opt_a = optimizers.Adam(alpha=actor_lr)
     opt_c = optimizers.Adam(alpha=critic_lr)
