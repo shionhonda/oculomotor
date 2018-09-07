@@ -40,8 +40,8 @@ class SC(object):
         '''
         self.thresholds = bg_data[:-1]
         diff = fef_data[:64,0]-bg_data[:-1]
-        self.last_sc_data = diff
-        max_idx = np.argmax(self.last_sc_data)
+        self.last_sc_data = softmax(diff)
+        max_idx = np.random.choice(64, p=self.last_sc_data)
         action = fef_data[max_idx, 1:]
         return action
 
