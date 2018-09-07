@@ -2,8 +2,10 @@ import argparse
 import numpy
 import brica
 import chainer
-from chainer import cuda, optimizers
+from chainer import optimizers
+from chainer.backends import cuda
 import chainerrl
+import time
 
 
 """
@@ -19,8 +21,8 @@ class BG(object):
         if gpuid<0:
             self.xp = numpy
         else:
+            print("Use GPU")
             cuda.get_device(gpuid).use()
-
             self.xp = cuda.cupy
 
         chainer.config.train = train
@@ -39,6 +41,7 @@ class BG(object):
           likelihood_thresholds: numpy array size of 128+1
         """
         # from_envがない
+        #start = time.time()
 
         if 'from_environment' not in inputs:
             raise Exception('BG did not recieve from Environment')
@@ -47,13 +50,17 @@ class BG(object):
         if 'from_fef' not in inputs:
             raise Exception('BG did not recieve from FEF')
 
-        fef_data = self.xp.array(inputs['from_fef'][:64])
+        fef_data = self._phi(inputs['from_fef'][:64])
         pfc_data = inputs['from_pfc']
-        state = fef_data[:, 0]
+        state = self._phi(fef_data[:, 0])
         action = self.agent.act_and_train(state, self.reward)
         self.reward, done = inputs['from_environment']
+        output_sc = self.xp.hstack((action, pfc_data))
 
-        return dict(to_pfc=None, to_fef=None, to_sc=self.xp.hstack((action, pfc_data)))
+        #elapsed_time = time.time()-start
+        #print("Elapsed time:{0}".format(elapsed_time) + "[sec]")
+
+        return dict(to_pfc=None, to_fef=None, to_sc=cuda.to_cpu(output_sc))
 
     def _phi(self, obs):
         return obs.astype(self.xp.float32)
@@ -73,6 +80,8 @@ class BG(object):
             q_func.to_gpu(gpuid)
             pi.to_gpu(gpuid)
         model = chainerrl.agents.ddpg.DDPGModel(q_func=q_func, policy=pi)
+        if gpuid>=0:
+            model.to_gpu()
         opt_a = optimizers.Adam(alpha=actor_lr)
         opt_c = optimizers.Adam(alpha=critic_lr)
         opt_a.setup(model['policy'])

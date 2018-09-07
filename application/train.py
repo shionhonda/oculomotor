@@ -11,6 +11,7 @@ from oculoenv import Environment
 from oculoenv import PointToTargetContent, ChangeDetectionContent, OddOneOutContent, VisualSearchContent, \
     MultipleObjectTrackingContent, RandomDotMotionDiscriminationContent
 from logger import Logger
+import copy
 
 
 
