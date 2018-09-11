@@ -38,10 +38,12 @@ class SC(object):
           Inputs: 
             bg_data: 0-63 are saliency thresholds; 64-127 are cursor thresholds; 128 is lambda
         '''
-        self.thresholds = bg_data[:-1]
-        diff = fef_data[:64,0]-bg_data[:-1]
-        self.last_sc_data = softmax(diff)
-        max_idx = np.random.choice(64, p=self.last_sc_data)
+        self.thresholds = bg_data[:64]
+        # print('MAX', np.max(fef_data[:64,0]))
+        # print('MIN', np.min(fef_data[:64,0]))
+        diff = fef_data[:64,0]-self.thresholds
+        self.last_sc_data = diff
+        max_idx = np.argmax(diff)
         action = fef_data[max_idx, 1:]
         return action
 

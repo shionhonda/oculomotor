@@ -40,7 +40,7 @@ class Inspector(object):
         self.fef = FEF()
         #self.bg = BG() # Train mode
         self.bg = BG(train=False, backprop=False) # Test mode
-        self.bg.agent.load("./results/"+str(293)) # Test mode
+        self.bg.agent.load("./results/85") # Test mode
         self.sc = SC()
         self.hp = HP()
         self.cb = CB()
@@ -162,6 +162,7 @@ class Inspector(object):
     def show_reward(self):
         self.draw_text("REWARD: {}".format(int(self.episode_reward)),
                         128 * 3 + 24, 380)
+        #print(self.bg.reward)
         self.draw_text("PHASE: {}".format(int(self.pfc.phase)),
                             128 * 3 + 24, 400)
 
@@ -183,22 +184,22 @@ class Inspector(object):
                               bottom + 8)
 
     def show_fef_data_grid(self, fef_data):
-        grid_division = int(math.sqrt(len(fef_data) // 2))
+        grid_division = int(math.sqrt(len(fef_data)))
         grid_width = 128 // grid_division
 
         likelihoods0 = []
-        likelihoods1 = []
+        #likelihoods1 = []
 
-        data_len = len(fef_data) // 2
+        data_len = len(fef_data)
 
         for i in range(data_len):
             likelihoods0.append(fef_data[i][0])
-            likelihoods1.append(fef_data[i + data_len][0])
+            #likelihoods1.append(fef_data[i + data_len][0])
 
         self.show_grid(likelihoods0, 0, grid_division, grid_width, 8, 200,
                        "saliency acc")
-        self.show_grid(likelihoods1, 0, grid_division, grid_width, 8 + 128*2,
-                       200, "cursor acc")
+        #self.show_grid(likelihoods1, 0, grid_division, grid_width, 8 + 128*2,
+         #              200, "cursor acc")
 
     def show_grid(self, data, offset, grid_division, grid_width, left, top,
                   label):

@@ -60,6 +60,7 @@ class Agent(object):
         ('vc', 'pfc'), # offset=2
         ('hp', 'pfc'), # offset=2
         ('vc', 'fef'),
+        ('vc', 'bg'),
         ('pfc', 'fef'), # offset=3
         ('pfc', 'bg'),
         ('fef', 'pfc'), # offset=4

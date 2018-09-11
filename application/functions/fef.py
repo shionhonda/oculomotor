@@ -16,7 +16,7 @@ GRID_DIVISION = 8
 GRID_WIDTH = 128 // GRID_DIVISION
 
 CURSOR_MATCH_COEFF = 0.3
-SALIENCY_COEFF = 0.3
+SALIENCY_COEFF = 0.1
 
 
 class ActionAccumulator(object):
@@ -70,7 +70,7 @@ class ActionAccumulator(object):
 
 class SaliencyAccumulator(ActionAccumulator):
     def __init__(self, pixel_x, pixel_y, ex, ey):
-        super(SaliencyAccumulator, self).__init__(ex, ey, decay_rate=0.95)
+        super(SaliencyAccumulator, self).__init__(ex, ey, decay_rate=0.9)
         # Pixel x,y pos at left top corner of the region.
         self.pixel_x = pixel_x
         self.pixel_y = pixel_y
@@ -161,8 +161,8 @@ class FEF(object):
 
         for saliency_accumulator in self.saliency_accumulators:
             saliency_accumulator.post_process()
-        for cursor_accumulator in self.cursor_accumulators:
-            cursor_accumulator.post_process()
+        # for cursor_accumulator in self.cursor_accumulators:
+        #     cursor_accumulator.post_process()
         
         output = self._collect_output()
         
@@ -175,6 +175,7 @@ class FEF(object):
         output = []
         for saliency_accumulator in self.saliency_accumulators:
             output.append(saliency_accumulator.output)
-        for cursor_accumulator in self.cursor_accumulators:
-            output.append(cursor_accumulator.output)
+        # for cursor_accumulator in self.cursor_accumulators:
+        #     output.append(cursor_accumulator.output)
+        # 64
         return np.array(output, dtype=np.float32)

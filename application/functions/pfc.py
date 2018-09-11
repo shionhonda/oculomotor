@@ -68,24 +68,24 @@ class PFC(object):
 
         # This is a very sample implementation of phase detection.
         # You should change here as you like.
-        self.cursor_find_accmulator.process(retina_image)
-        self.cursor_find_accmulator.post_process()
+        # self.cursor_find_accmulator.process(retina_image)
+        # self.cursor_find_accmulator.post_process()
         
-        if self.phase == Phase.INIT:
-            if self.cursor_find_accmulator.likelihood > 0.7:
-                self.phase = Phase.START
-        elif self.phase == Phase.START:
-            if self.cursor_find_accmulator.likelihood < 0.4:
-                self.phase = Phase.TARGET
-        else:
-            if self.cursor_find_accmulator.likelihood > 0.6:
-                self.phase = Phase.START
+        # if self.phase == Phase.INIT:
+        #     if self.cursor_find_accmulator.likelihood > 0.7:
+        #         self.phase = Phase.START
+        # elif self.phase == Phase.START:
+        #     if self.cursor_find_accmulator.likelihood < 0.4:
+        #         self.phase = Phase.TARGET
+        # else:
+        #     if self.cursor_find_accmulator.likelihood > 0.6:
+        #         self.phase = Phase.START
         
-        if self.phase == Phase.INIT or self.phase == Phase.START:
-            # TODO: 領野をまたいだ共通phaseをどう定義するか？
-            fef_message = 0
-        else:
-            fef_message = 1
+        # if self.phase == Phase.INIT or self.phase == Phase.START:
+        #     # TODO: 領野をまたいだ共通phaseをどう定義するか？
+        #     fef_message = 0
+        # else:
+        #     fef_message = 1
 
         # TEST: Without cursor phase
         fef_message = 1

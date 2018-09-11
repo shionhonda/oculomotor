@@ -49,12 +49,16 @@ class BG(object):
             raise Exception('BG did not recieve from PFC')
         if 'from_fef' not in inputs:
             raise Exception('BG did not recieve from FEF')
+        if 'from_vc' not in inputs:
+            raise Exception('BG did not recieve from VC')
 
-        fef_data = self._phi(inputs['from_fef'][:64])
+        fef_data = self._phi(inputs['from_fef'][:])
         pfc_data = inputs['from_pfc']
+        penalty = inputs['from_vc']
         state = self._phi(fef_data[:, 0])
         action = self.agent.act_and_train(state, self.reward)
         self.reward, done = inputs['from_environment']
+        self.reward += penalty
         output_sc = self.xp.hstack((action, pfc_data))
 
         #elapsed_time = time.time()-start
@@ -65,16 +69,16 @@ class BG(object):
     def _phi(self, obs):
         return obs.astype(self.xp.float32)
 
-    def _set_agent(self, gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=200):
+    def _set_agent(self, gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=3600):
         q_func = chainerrl.q_functions.FCSAQFunction(
             64, 64,
             n_hidden_channels=16,
             n_hidden_layers=3)
         pi = chainerrl.policy.FCDeterministicPolicy(
             64, action_size=64,
-            n_hidden_channels=16,
+            n_hidden_channels=8,
             n_hidden_layers=3,
-            min_action=0, max_action=1,
+            min_action=-0.5, max_action=0.5,
             bound_action=True)
         if gpuid>=0:
             q_func.to_gpu(gpuid)
