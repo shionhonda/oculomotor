@@ -39,7 +39,6 @@ def get_content(content_type):
         content = RandomDotMotionDiscriminationContent()
     return content
 
-
 def train(content, step_size, logger, gpuid):
     retina = Retina()
     lip = LIP()

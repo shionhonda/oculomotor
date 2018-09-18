@@ -61,8 +61,8 @@ class BG(object):
         self.reward += penalty
         output_sc = self.xp.hstack((action, pfc_data))
 
-        #elapsed_time = time.time()-start
-        #print("Elapsed time:{0}".format(elapsed_time) + "[sec]")
+        # elapsed_time = time.time()-start
+        # print("Elapsed time:{0}".format(elapsed_time) + "[sec]")
 
         return dict(to_pfc=None, to_fef=None, to_sc=cuda.to_cpu(output_sc))
 
@@ -72,7 +72,7 @@ class BG(object):
     def _set_agent(self, gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=3600):
         q_func = chainerrl.q_functions.FCSAQFunction(
             64, 64,
-            n_hidden_channels=16,
+            n_hidden_channels=8,
             n_hidden_layers=3)
         pi = chainerrl.policy.FCDeterministicPolicy(
             64, action_size=64,
@@ -103,5 +103,5 @@ class BG(object):
                     update_interval=4,
                     soft_update_tau=1e-2,
                     n_times_update=1,
-                    phi=self._phi, gpu=-1, minibatch_size=minibatch_size)
+                    phi=self._phi, gpu=gpuid, minibatch_size=minibatch_size)
         return agent
