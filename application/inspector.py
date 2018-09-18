@@ -38,9 +38,9 @@ class Inspector(object):
         self.vc = VC()
         self.pfc = PFC()
         self.fef = FEF()
-        #self.bg = BG() # Train mode
-        self.bg = BG(train=False, backprop=False) # Test mode
-        self.bg.agent.load("./results/194") # Test mode
+        self.bg = BG() # Train mode
+        #self.bg = BG(train=False, backprop=False) # Test mode
+        #self.bg.agent.load("./results/194") # Test mode
         self.sc = SC()
         self.hp = HP()
         self.cb = CB()
