@@ -12,7 +12,7 @@ class SC(object):
 
         self.last_fef_data = None
         self.last_sc_data = None
-        self.thresholds = None
+        self.baseline = None
 
     def __call__(self, inputs):
         if 'from_fef' not in inputs:
@@ -38,16 +38,8 @@ class SC(object):
           Inputs: 
             bg_data: 0-63 are saliency thresholds; 64-127 are cursor thresholds; 128 is lambda
         '''
-        # self.baseline = gauss_mixture(bg_data)
-        # diff = fef_data[:64,0]+self.baseline
-        # self.last_sc_data = diff
-        # max_idx = np.argmax(diff)
-        # action = fef_data[max_idx, 1:]
-        # return 
-        self.thresholds = bg_data[:64]
-        # print('MAX', np.max(fef_data[:64,0]))
-        # print('MIN', np.min(fef_data[:64,0]))
-        diff = fef_data[:64,0]-self.thresholds
+        self.baseline = gauss_mixture(bg_data)
+        diff = fef_data[:64,0]+self.baseline
         self.last_sc_data = diff
         max_idx = np.argmax(diff)
         action = fef_data[max_idx, 1:]

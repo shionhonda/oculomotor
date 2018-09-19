@@ -38,9 +38,9 @@ class Inspector(object):
         self.vc = VC()
         self.pfc = PFC()
         self.fef = FEF()
-        self.bg = BG() # Train mode
-        #self.bg = BG(train=False, backprop=False) # Test mode
-        #self.bg.agent.load("./results/194") # Test mode
+        #self.bg = BG() # Train mode
+        self.bg = BG(train=False, backprop=False) # Test mode
+        self.bg.agent.load("./results/359") # Test mode
         self.sc = SC()
         self.hp = HP()
         self.cb = CB()
@@ -113,9 +113,12 @@ class Inspector(object):
         self.show_grid(data,0, 8, 16, 8, 380, "action")
 
     def show_thres_map(self, thresholds):
-        sal_std = (thresholds[:64]-np.min(thresholds[:64]))/(np.max(thresholds[:64])-np.min(thresholds[:64]))
+        denom = np.max(thresholds[:64])-np.min(thresholds[:64])
+        if denom<=0:
+            denom = 1e-10
+        sal_std = (thresholds[:64]-np.min(thresholds[:64]))/denom
         #cur_std = (thresholds[64:]-np.min(thresholds[64:]))/(np.max(thresholds[64:])-np.min(thresholds[64:]))
-        self.show_grid(sal_std,0, 8, 16, 128 + 8, 200, "saliency thres")
+        self.show_grid(sal_std,0, 8, 16, 128 + 8, 200, "saliency baseline")
         #self.show_grid(cur_std,0, 8, 16, 128 * 3 + 8, 200, "cursor thres")
 
     def show_optical_flow(self, optical_flow):
@@ -252,9 +255,9 @@ class Inspector(object):
             #self.show_fef_data_bars(self.sc.last_fef_data)
             self.show_fef_data_grid(self.sc.last_fef_data)
 
-        if self.sc.thresholds is not None:
+        if self.sc.baseline is not None:
             #self.show_fef_data_bars(self.sc.last_fef_data)
-            self.show_thres_map(self.sc.thresholds)
+            self.show_thres_map(self.sc.baseline)
         # if self.hp.map_image is not None:
         #     self.show_map_image(self.hp.map_image)
 
