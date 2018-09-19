@@ -55,7 +55,6 @@ class OpticalFlow(object):
 
 class LIP(object):
     """ Retina module.
-
     This LIP module calculates saliency map and optical flow from retina image.
     """
     
@@ -101,6 +100,7 @@ class LIP(object):
 
         # Apply box filter
         log_magnitude_filtered = cv2.blur(log_magnitude, ksize=(3, 3))
+
         # Calculate residual
         magnitude_residual = np.exp(log_magnitude - log_magnitude_filtered)
 
@@ -120,16 +120,30 @@ class LIP(object):
         image_resized = cv2.resize(image, resize_shape[1::-1])
         # (64,64,3)
 
-        image_gray = np.mean(image_resized, axis=2)
+        saliency = np.zeros_like(image_resized, dtype=np.float32)
+        # (64,64,3)
+    
+        channel_size = image_resized.shape[2]
+    
+        for ch in range(channel_size):
+            ch_image = image_resized[:, :, ch]
+            saliency[:, :, ch] = self._get_saliency_magnitude(ch_image)
+
+        # Calclate max over channels
+        saliency = np.max(saliency, axis=2)
         # (64,64)
 
-        saliency = self._get_saliency_magnitude(image_gray)
-      
         saliency = cv2.GaussianBlur(saliency, GAUSSIAN_KERNEL_SIZE, sigmaX=8, sigmaY=0)
-        saliency = (saliency ** (1/2))
-        saliency = saliency / np.max(saliency) # Normalize
+
+        #SALIENCY_ENHANCE_COEFF = 2.0 # Strong saliency contrast
+        SALIENCY_ENHANCE_COEFF = 1 # Low saliency contrast, but sensible for weak saliency
+
+        # Emphasize saliency
+        saliency = (saliency ** SALIENCY_ENHANCE_COEFF)
+
+        # Normalize to 0.0~1.0
+        saliency = saliency / np.max(saliency)
     
         # Resize to original size
         saliency = cv2.resize(saliency, image.shape[1::-1])
-        
         return saliency
