@@ -28,12 +28,13 @@ class Retina(object):
         
         image, angle = inputs['from_environment']
         retina_image = self._create_retina_image(image)
+        is_white = self._is_white(image)
 
         # Store retina image for debug visualizer
         self.last_retina_image = retina_image
 
         return dict(to_lip=retina_image,
-                    to_vc=retina_image,
+                    to_vc=(retina_image, is_white),
                     to_hp=(retina_image, angle))
 
     def _gauss(self, x, sigma):
@@ -74,6 +75,50 @@ class Retina(object):
         inv_rates = 1.0 - rates
         return rates, inv_rates
 
+    def _is_white(self, image):
+        return np.sum(np.sum(image, axis=2)>764)>100
+
+    def _create_attention(self, image):
+        im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        if self._is_white(image):
+            _, im_cnt = cv2.threshold(im_gray, 245, 255, cv2.THRESH_BINARY)
+        else:
+            _, im_bin = cv2.threshold(im_gray, 10, 255, cv2.THRESH_BINARY)
+            im_inv = cv2.bitwise_not(im_bin) 
+            kernel = np.ones((3,3),np.uint8)
+            dilated = cv2.dilate(im_inv,kernel,iterations = 3)
+            im_cnt = cv2.erode(dilated,kernel,iterations = 4)
+            
+        _, contours, _ = cv2.findContours(im_cnt, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        approx = np.array([[0,0], [0,127], [127,0], [127,127]]) # initialize
+        for c in contours:
+            if cv2.contourArea(c)<500:
+                continue
+            epsilon = 0.01 * cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, epsilon, True)
+            if len(approx)<4:
+                continue
+            else:
+                break
+        
+        tmp = image.copy()
+        if self._is_white(image):
+            mask = cv2.fillConvexPoly(tmp, approx.reshape(-1,2), [255,255,255] )
+            mask_gray= cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+            _, mask_bin = cv2.threshold(mask_gray, 245, 255, cv2.THRESH_BINARY)
+            mask_inv = cv2.bitwise_not(mask_bin)
+            mask_inv = np.tile(mask_inv, (3,1,1)).transpose(1,2,0)
+            attention = (image.astype('int32'))+(mask_inv.astype('int32'))
+        else:
+            mask = cv2.fillConvexPoly(tmp, approx.reshape(-1,2), [0,0,0] )
+            mask_gray= cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+            _, mask_bin = cv2.threshold(mask_gray, 10, 255, cv2.THRESH_BINARY)
+            mask_inv = cv2.bitwise_not(mask_bin)
+            mask_inv = np.tile(mask_inv, (3,1,1)).transpose(1,2,0)
+            attention = (image.astype('int32'))*(mask_inv.astype('int32'))/255        
+        attention = np.clip(attention, 0, 255)
+        return attention.astype('uint8')
+
     def _create_blur_image(self, image):
         h = image.shape[0]
         w = image.shape[1]
@@ -105,9 +150,11 @@ class Retina(object):
         return blur_image, gray_blur_image
 
     def _create_retina_image(self, image):
-        blur_image, gray_blur_image = self._create_blur_image(image)
+        processed = self._create_attention(image)
+        blur_image, gray_blur_image = self._create_blur_image(processed)
         # Mix original and blur image
-        blur_mix_image = image * self.blur_rates + blur_image * self.inv_blur_rates
+        blur_mix_image = processed * self.blur_rates + blur_image * self.inv_blur_rates
         # Mix blur mixed image and gray blur image.
         gray_mix_image = blur_mix_image * self.gray_rates + gray_blur_image * self.inv_gray_rates
-        return gray_mix_image.astype(np.uint8)
+        return processed
+#        return gray_mix_image.astype(np.uint8)
