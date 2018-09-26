@@ -156,5 +156,4 @@ class Retina(object):
         blur_mix_image = processed * self.blur_rates + blur_image * self.inv_blur_rates
         # Mix blur mixed image and gray blur image.
         gray_mix_image = blur_mix_image * self.gray_rates + gray_blur_image * self.inv_gray_rates
-        return processed
-#        return gray_mix_image.astype(np.uint8)
+        return gray_mix_image.astype(np.uint8)

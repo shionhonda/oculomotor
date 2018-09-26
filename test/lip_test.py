@@ -6,8 +6,8 @@ import numpy as np
 import time
 import glob
 import cv2
-from functions.lip import LIP, SaliencyMap
-from functions.retina import Retina
+from application.functions.lip import LIP, SaliencyMap
+from application.functions.retina import Retina
 
 
 class TestLIP(unittest.TestCase):
@@ -52,9 +52,6 @@ class TestLIP(unittest.TestCase):
         file_base_name = os.path.splitext(os.path.basename(file_path))[0]
         
         retina_image = self.convert_to_retina_image(image)
-        #retina_image = image
-        #saliency_map = SaliencyMap(retina_image).map
-        #saliency_map /= np.max(saliency_map)
         saliency_map = self.lip._get_saliency_map(retina_image)
         saliency_map = saliency_map[:,:,np.newaxis].repeat(3, axis=2)
         saliency_map = (saliency_map * 255.0).astype(np.uint8)
@@ -66,14 +63,14 @@ class TestLIP(unittest.TestCase):
         if not os.path.exists(self.get_file_path("test_results")):
             os.mkdir(self.get_file_path("test_results"))
         
-        images_dir_path = self.get_file_path("images/task_images")
+        images_dir_path = self.get_file_path("images/mask_images")
         
         file_path_list = glob.glob("{}/*.png".format(images_dir_path))
         for file_path in file_path_list:
             self.sub_test_saliency_map(file_path)
             
     def test_saliency_map_performance(self):
-        image = self.load_image("images/task_images/1_000.png")
+        image = self.load_image("images/mask_images/out_1_000.png")
         
         start = time.time()
         frame_size = 100

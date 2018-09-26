@@ -95,8 +95,8 @@ class TestMask(unittest.TestCase):
         attention = np.clip(attention, 0, 255)
         attention = attention.astype('uint8')
 
-        img = self.concat_images([im_orig, im_color, attention])
-        self.save_image(img, "test_results/out_{}.png".format(file_base_name))
+        #img = self.concat_images([im_orig, im_color, attention])
+        self.save_image(attention, "test_results/out_{}.png".format(file_base_name))
 
     def test_attention(self):
         if not os.path.exists(self.get_file_path("test_results")):
