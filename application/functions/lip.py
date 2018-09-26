@@ -135,7 +135,7 @@ class LIP(object):
 
         saliency = cv2.GaussianBlur(saliency, GAUSSIAN_KERNEL_SIZE, sigmaX=8, sigmaY=0)
 
-        SALIENCY_ENHANCE_COEFF = 1 # Strong saliency contrast
+        SALIENCY_ENHANCE_COEFF = 1.5 # Strong saliency contrast
         #SALIENCY_ENHANCE_COEFF = 1 # Low saliency contrast, but sensible for weak saliency
 
         # Emphasize saliency
