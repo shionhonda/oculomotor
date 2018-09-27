@@ -24,7 +24,6 @@ class HP(object):
         # acculate.
         if inputs['from_retina'] is not None:
             image, angle = inputs['from_retina'] # (128, 128, 3), (2)
-
             # Transform input image into allocentric panel image
             transforemed_image = self._extract_transformed_image(image, angle)
 

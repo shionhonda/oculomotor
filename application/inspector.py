@@ -40,7 +40,7 @@ class Inspector(object):
         self.fef = FEF()
         #self.bg = BG() # Train mode
         self.bg = BG(train=False, backprop=False) # Test mode
-        self.bg.agent.load("./results/239") # Test mode
+        self.bg.agent.load("./results/exp21_after") # Test mode
         self.sc = SC()
         self.hp = HP()
         self.cb = CB()
