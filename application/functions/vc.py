@@ -16,15 +16,13 @@ class VC(object):
         if 'from_retina' not in inputs:
             raise Exception('VC did not recieve from Retina')
         penalty = 0
-        retina_image = inputs['from_retina']
-        retina_hsv = retina_image.copy()
-        retina_hsv = cv2.cvtColor(retina_hsv.astype(np.uint8), cv2.COLOR_RGB2HSV)
-        lightblue = np.array([115,209,255], np.uint8)
-        lightblue =  np.tile(lightblue,(128,128,1))
-        lightblue = cv2.cvtColor(lightblue, cv2.COLOR_RGB2HSV)
-        cos_sim = _cosine_similarity(lightblue[32:96,32:96,:], retina_hsv[32:96,32:96,:])
-
-        penalty = min(0, (self.thres-cos_sim)*20)
+        retina_image = inputs['from_retina'][0]
+        is_white = inputs['from_retina'][1]
+        if is_white:
+            cnt = np.sum(np.sum(retina_image, axis=2)>255*3-1)
+        else:
+            cnt = np.sum(np.sum(retina_image, axis=2)<1)
+            penalty = min(0, (cnt-10000)/500)
         #print(penalty)
         
 

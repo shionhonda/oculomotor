@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
-
+import math
+import itertools
 import brica
+from .utils import Util
 
 
 GAUSSIAN_KERNEL_SIZE = (5,5)
@@ -52,10 +54,9 @@ class OpticalFlow(object):
         self.last_gray_image = gray_image
         return self.flow
 
-
 class LIP(object):
     """ Retina module.
-    This LIP module calculates saliency map and optical flow from retina image.
+    This LIP module calculates saliency cv2. and optical flow from retina image.
     """
     
     def __init__(self):
@@ -71,8 +72,7 @@ class LIP(object):
             raise Exception('LIP did not recieve from Retina')
 
         retina_image = inputs['from_retina'] # (128, 128, 3)
-        saliency_map = self._get_saliency_map(retina_image) # (128, 128)
-
+        saliency_map = self._get_saliency_map(retina_image)
         use_saliency_flow = False
 
         if not use_saliency_flow:
@@ -135,14 +135,14 @@ class LIP(object):
 
         saliency = cv2.GaussianBlur(saliency, GAUSSIAN_KERNEL_SIZE, sigmaX=8, sigmaY=0)
 
-        #SALIENCY_ENHANCE_COEFF = 2.0 # Strong saliency contrast
-        SALIENCY_ENHANCE_COEFF = 1 # Low saliency contrast, but sensible for weak saliency
+        SALIENCY_ENHANCE_COEFF = 1.5 # Strong saliency contrast
+        #SALIENCY_ENHANCE_COEFF = 1 # Low saliency contrast, but sensible for weak saliency
 
         # Emphasize saliency
         saliency = (saliency ** SALIENCY_ENHANCE_COEFF)
 
         # Normalize to 0.0~1.0
-        saliency = saliency / np.max(saliency)
+        saliency = (saliency-np.min(saliency)) / (np.max(saliency)-np.min(saliency))
     
         # Resize to original size
         saliency = cv2.resize(saliency, image.shape[1::-1])

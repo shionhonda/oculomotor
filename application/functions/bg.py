@@ -69,7 +69,7 @@ class BG(object):
     def _phi(self, obs):
         return obs.astype(self.xp.float32)
 
-    def _set_agent(self, gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=300):
+    def _set_agent(self, gpuid=-1,actor_lr=1e-4, critic_lr=1e-3, gamma=0.995, minibatch_size=600):
         q_func = chainerrl.q_functions.FCSAQFunction(
             64, 10,
             n_hidden_channels=8,

@@ -39,7 +39,7 @@ class SC(object):
             bg_data: 0-63 are saliency thresholds; 64-127 are cursor thresholds; 128 is lambda
         '''
         self.baseline = gauss_mixture(bg_data)
-        diff = fef_data[:64,0]+self.baseline
+        diff = fef_data[:64,0]#+self.baseline
         self.last_sc_data = diff
         max_idx = np.argmax(diff)
         action = fef_data[max_idx, 1:]
