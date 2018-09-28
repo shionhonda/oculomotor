@@ -11,8 +11,8 @@ You can change this as you like.
 
 class Phase(object):
     INIT = -1  # Initial phase
-    START = 0  # Start phase while finding red cross cursor
-    TARGET = 1 # Target finding phsae
+    SEARCH = 0  # Target finding phsae
+    EXPLORE = 1 # Explore every corner
 
 
 class CursorFindAccumulator(object):
@@ -64,30 +64,16 @@ class PFC(object):
         # Image from Visual cortex module.
         retina_image = inputs['from_vc']
         # Allocentrix map image from hippocampal formatin module.
-        map_image = inputs['from_hp']
+        map_image = inputs['from_hp'][0]
+        angle = inputs['from_hp'][1]
+        # Used time to search
+        time = inputs["from_bg"]
 
-        # This is a very sample implementation of phase detection.
-        # You should change here as you like.
-        # self.cursor_find_accmulator.process(retina_image)
-        # self.cursor_find_accmulator.post_process()
-        
-        # if self.phase == Phase.INIT:
-        #     if self.cursor_find_accmulator.likelihood > 0.7:
-        #         self.phase = Phase.START
-        # elif self.phase == Phase.START:
-        #     if self.cursor_find_accmulator.likelihood < 0.4:
-        #         self.phase = Phase.TARGET
-        # else:
-        #     if self.cursor_find_accmulator.likelihood > 0.6:
-        #         self.phase = Phase.START
-        
-        # if self.phase == Phase.INIT or self.phase == Phase.START:
-        #     # TODO: 領野をまたいだ共通phaseをどう定義するか？
-        #     fef_message = 0
-        # else:
-        #     fef_message = 1
+        if time is not None:
+            if time<250:
+                self.phase = Phase.SEARCH
+            else:
+                self.phase = Phase.EXPLORE
 
-        # TEST: Without cursor phase
-        fef_message = 1
-        return dict(to_fef=fef_message,
-                    to_bg=fef_message)
+        return dict(to_fef= (self.phase, angle),
+                    to_bg=self.phase)

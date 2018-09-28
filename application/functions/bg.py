@@ -18,6 +18,7 @@ class BG(object):
         self.timing = brica.Timing(5, 1, 0)
         self.agent = self._set_agent(gpuid=gpuid)
         self.reward = 0
+        self.time = 0
         if gpuid<0:
             self.xp = numpy
         else:
@@ -40,8 +41,6 @@ class BG(object):
         Outputs:
           likelihood_thresholds: numpy array size of 128+1
         """
-        # from_envがない
-        #start = time.time()
 
         if 'from_environment' not in inputs:
             raise Exception('BG did not recieve from Environment')
@@ -53,18 +52,19 @@ class BG(object):
             raise Exception('BG did not recieve from VC')
 
         fef_data = self._phi(inputs['from_fef'][:])
-        pfc_data = inputs['from_pfc']
+        phase = inputs['from_pfc']
         penalty = inputs['from_vc']
         state = self._phi(fef_data[:, 0])
         action = self.agent.act_and_train(state, self.reward)
-        self.reward, done = inputs['from_environment']
-        self.reward += penalty
-        output_sc = self.xp.hstack((action, pfc_data))
+        reward, done = inputs['from_environment']
+        self.time += 1
+        if reward>0:
+            self.time = 0
+        self.reward = self.reward + reward + penalty
+        output_sc = self.xp.hstack((action, phase))
 
-        # elapsed_time = time.time()-start
-        # print("Elapsed time:{0}".format(elapsed_time) + "[sec]")
 
-        return dict(to_pfc=None, to_fef=None, to_sc=cuda.to_cpu(output_sc))
+        return dict(to_pfc=self.time, to_fef=None, to_sc=output_sc)
 
     def _phi(self, obs):
         return obs.astype(self.xp.float32)

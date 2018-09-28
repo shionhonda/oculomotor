@@ -146,36 +146,27 @@ class FEF(object):
         if 'from_bg' not in inputs:
             raise Exception('FEF did not recieve from BG')
 
-        phase = inputs['from_pfc']
+        pfc_data = inputs['from_pfc']
 
         saliency_map, optical_flow = inputs['from_lip']
         retina_image = inputs['from_vc']
         
         # TODO: 領野をまたいだ共通phaseをどう定義するか？
-        if phase == 0:
-            for cursor_accumulator in self.cursor_accumulators:
-                cursor_accumulator.process(retina_image)
-        else:
-            for saliency_accumulator in self.saliency_accumulators:
-                saliency_accumulator.process(saliency_map)
+        for saliency_accumulator in self.saliency_accumulators:
+            saliency_accumulator.process(saliency_map)
 
         for saliency_accumulator in self.saliency_accumulators:
             saliency_accumulator.post_process()
-        # for cursor_accumulator in self.cursor_accumulators:
-        #     cursor_accumulator.post_process()
         
         output = self._collect_output()
         
         return dict(to_pfc=None,
                     to_bg=output,
-                    to_sc=output,
+                    to_sc=(output, pfc_data[0], pfc_data[1]),
                     to_cb=None)
 
     def _collect_output(self):
         output = []
         for saliency_accumulator in self.saliency_accumulators:
             output.append(saliency_accumulator.output)
-        # for cursor_accumulator in self.cursor_accumulators:
-        #     output.append(cursor_accumulator.output)
-        # 64
         return np.array(output, dtype=np.float32)

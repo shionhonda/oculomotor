@@ -30,7 +30,7 @@ class HP(object):
             # Overlay into existing map image
             self._overlay_extracted_image(self.map_image, transforemed_image)
         
-        return dict(to_pfc=self.map_image)
+        return dict(to_pfc=(self.map_image, angle))
 
     def _get_perspective_mat(self, fovy, aspect_ratio, znear, zfar):
         ymax = znear * math.tan(fovy * math.pi / 360.0)
